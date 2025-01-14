@@ -54,7 +54,7 @@ def download_mp3(url, destination_folder):
             "-o",
             f"{destination_folder}/%(title)s.%(ext)s",  # Output format
         ]
-        result = subprocess.run(command, check=True, text=True, capture_output=True)
+        result = subprocess.run(command, check=True, capture_output=True)
         print(f"Downloading MP3 with yt-dlp: {result.stdout}")
 
     except subprocess.CalledProcessError as e:
