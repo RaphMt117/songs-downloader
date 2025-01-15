@@ -4,8 +4,8 @@ Made for personal use only
 
 ## How to use
 
-- You need to have [youtube-dl](https://github.com/ytdl-org/youtube-dl) installed and
-  the executable (`yt-dl`) in your path
+- You need to have [yt-dlp](https://github.com/yt-dlp/yt-dlp) installed and
+  the executable (`yt-dlp`) in your path
 
 - Python packages:
 
