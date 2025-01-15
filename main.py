@@ -14,7 +14,7 @@ destination_folder = os.getenv("DESTINATION_FOLDER")
 if api_key is None:
     raise ValueError("API_KEY environment variable is not set.")
 if destination_folder is None:
-    raise ValueError("DESTINATION_FOLDER environment variable is not set.")
+    destination_folder = os.path.expanduser
 
 
 # Query YouTube API and return the first URL
@@ -54,8 +54,12 @@ def download_mp3(url, destination_folder):
             "-o",
             f"{destination_folder}/%(title)s.%(ext)s",  # Output format
         ]
+        print(f"Downloading MP3 with yt-dlp for {url}")
         result = subprocess.run(command, check=True, capture_output=True)
-        print(f"Downloading MP3 with yt-dlp: {result.stdout}")
+        result.check_returncode
+
+        print("Download completed successfully.")
+        print("Output:", result.stdout)
 
     except subprocess.CalledProcessError as e:
         print(f"Error while downloading {url}: {e.stderr}")

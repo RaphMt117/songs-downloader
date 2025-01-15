@@ -1,6 +1,6 @@
 # Songs downloader
 
-made for personal use only
+Made for personal use only
 
 ## How to use
 
@@ -33,6 +33,12 @@ artists:
 
 - Enable youtube data api, see [doc](https://support.google.com/googleapi/answer/6158841?hl=en&ref_topic=7013279&sjid=16203019970447198290-SA)
 
-- You need to set a .env file with:
+### Env file
+
+- Mandatory:
+
   - `API_KEY`: your google api key, with permission to use youtube api
+
+- Optional:
+
   - `DESTINATION_FOLDER`: the path to the folder that will store your songs
