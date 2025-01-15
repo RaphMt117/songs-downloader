@@ -2,10 +2,8 @@ from dotenv import load_dotenv
 import yaml
 import subprocess
 import requests
+import shutil
 import os
-
-with open("songs.yml", "r") as file:
-    data = yaml.safe_load(file)
 
 load_dotenv()
 api_key = os.getenv("API_KEY")
@@ -16,9 +14,11 @@ if api_key is None:
 if destination_folder is None:
     destination_folder = os.path.expanduser
 
+with open("songs.yml", "r") as file:
+    data = yaml.safe_load(file)
 
-# Query YouTube API and return the first URL
-def query_youtube(artist, song, api_key):
+
+def get_url_by_song(artist, song, api_key):
     base_url = "https://www.googleapis.com/youtube/v3/search"
     query = f"{artist} {song}"
     params = {
@@ -30,36 +30,36 @@ def query_youtube(artist, song, api_key):
         "key": api_key,
     }
 
+    print(f"Querying for: {artist} - {song}")
     response = requests.get(base_url, params=params)
+
     if response.status_code == 200:
         results = response.json().get("items", [])
 
         if results:
-            # Extract the videoId for the first result
             video_id = results[0]["id"]["videoId"]
-            return f"https://www.youtube.com/watch?v={video_id}"
+            url = f"https://www.youtube.com/watch?v={video_id}"
+
+            print(f"Found url: {url}")
+            return url
 
     print(f"No results found for: {artist} - {song}")
     return None
 
 
-def download_mp3(url, destination_folder):
+def download_mp3_from_url(url):
     try:
         command = [
             "yt-dlp",
             url,
-            "-x",  # Extract audio
-            "--audio-format",
-            "mp3",  # Convert audio to MP3
-            "-o",
-            f"{destination_folder}/%(title)s.%(ext)s",  # Output format
+            "-x --audio-format mp3",  # extract audio + mp3 format
+            f"-o {destination_folder}/%(title)s.%(ext)s",  # output folder + file name format
         ]
         print(f"Downloading MP3 with yt-dlp for {url}")
         result = subprocess.run(command, check=True, capture_output=True)
         result.check_returncode
 
         print("Download completed successfully.")
-        print("Output:", result.stdout)
 
     except subprocess.CalledProcessError as e:
         print(f"Error while downloading {url}: {e.stderr}")
@@ -67,8 +67,6 @@ def download_mp3(url, destination_folder):
 
 for artist, songs in data.get("artists", {}).items():
     for song in songs:
-        print(f"Querying for: {artist} - {song}")
-        url = query_youtube(artist, song, api_key)
+        url = get_url_by_song(artist, song, api_key)
         if url:
-            print(f"Found URL for {artist} - {song}: {url}")
-            download_mp3(url, destination_folder)
+            download_mp3_from_url(url)
