@@ -16,6 +16,8 @@ if destination_folder is None:
 with open("songs.yml", "r") as file:
     data = yaml.safe_load(file)
 
+failed_songs = []
+
 
 def get_url_by_song(artist, song, api_key):
     base_url = "https://www.googleapis.com/youtube/v3/search"
@@ -43,6 +45,7 @@ def get_url_by_song(artist, song, api_key):
             return url
 
     print(f"No results found for: {artist} - {song}")
+    failed_songs.append({"name": f"{artist} - {song}", "url": None, "flow": "query"})
     return None
 
 
@@ -64,6 +67,9 @@ def download_mp3_from_url(url):
         print("Download completed successfully.")
 
     except subprocess.CalledProcessError as e:
+        failed_songs.append(
+            {"name": f"{artist} - {song}", "url": url, "flow": "download"}
+        )
         print(f"Error while downloading {url}: {e.stderr}")
 
 
@@ -72,3 +78,7 @@ for artist, songs in data.get("artists", {}).items():
         url = get_url_by_song(artist, song, api_key)
         if url:
             download_mp3_from_url(url)
+    print("Process finished")
+    if failed_songs:
+        print("Failed songs:")
+        print(failed_songs)
