@@ -2,7 +2,6 @@ from dotenv import load_dotenv
 import yaml
 import subprocess
 import requests
-import shutil
 import os
 
 load_dotenv()
@@ -22,11 +21,11 @@ def get_url_by_song(artist, song, api_key):
     base_url = "https://www.googleapis.com/youtube/v3/search"
     query = f"{artist} {song}"
     params = {
-        "part": "snippet",
+        "part": "id",
         "q": query,
         "type": "video",
-        "order": "relevance",
         "maxResults": 1,
+        "fields": "items/id/videoId",
         "key": api_key,
     }
 
@@ -52,8 +51,11 @@ def download_mp3_from_url(url):
         command = [
             "yt-dlp",
             url,
-            "-x --audio-format mp3",  # extract audio + mp3 format
-            f"-o {destination_folder}/%(title)s.%(ext)s",  # output folder + file name format
+            "-x",
+            "--audio-format",
+            "mp3",  # extract audio + mp3 format
+            "-o",
+            f"{destination_folder}/%(title)s.%(ext)s",  # output folder + file name format
         ]
         print(f"Downloading MP3 with yt-dlp for {url}")
         result = subprocess.run(command, check=True, capture_output=True)
